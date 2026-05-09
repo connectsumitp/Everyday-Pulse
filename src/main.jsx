@@ -18,7 +18,6 @@ import {
   Coins,
   Compass,
   Dice5,
-  Download,
   Flame,
   Grid2X2,
   Heart,
@@ -1703,7 +1702,7 @@ function XpChip({ xp, onClick }) {
 function InstallButton({ onClick }) {
   return (
     <button className="install-chip" onClick={onClick} title="Add to Home Screen" aria-label="Add to Home Screen">
-      <Download size={17} />
+      <Home size={17} />
     </button>
   );
 }
