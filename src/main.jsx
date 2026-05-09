@@ -335,7 +335,7 @@ function AuthProvider({ children }) {
 
     async function initializeAuth() {
       try {
-        const result = await withTimeout(supabase.auth.getSession(), { data: { session: null } }, 2000);
+        const result = await supabase.auth.getSession();
         if (!active) return;
         const nextSession = result?.data?.session ?? null;
         setSession(nextSession);
@@ -409,6 +409,8 @@ function RequireAuth({ children }) {
   if (!isSupabaseConfigured) return <ConfigMissing />;
   if (loading) return <LoadingScreen />;
   if (!user) return <Navigate to="/onboarding" replace state={{ from: location.pathname }} />;
+  if (profileLoading && !profile) return <LoadingScreen />;
+  if (!profile && location.pathname !== '/onboarding') return <Navigate to="/onboarding" replace />;
   if (profile && !profile.onboarding_completed && location.pathname !== '/onboarding') {
     return <Navigate to="/onboarding" replace />;
   }
@@ -534,22 +536,23 @@ function App() {
 }
 
 function RootRedirect() {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, profileLoading } = useAuth();
   if (!isSupabaseConfigured) return <ConfigMissing />;
   if (loading) return <LoadingScreen />;
   if (!user) return <Navigate to="/onboarding" replace />;
-  if (profile && !profile.onboarding_completed) return <Navigate to="/onboarding" replace />;
+  if (profileLoading && !profile) return <LoadingScreen />;
+  if (!profile || !profile.onboarding_completed) return <Navigate to="/onboarding" replace />;
   return <Navigate to="/home" replace />;
 }
 
 function Onboarding() {
-  const { user, profile, refreshProfile, loading } = useAuth();
+  const { user, profile, setProfile, refreshProfile, loading, profileLoading } = useAuth();
   const navigate = useNavigate();
   const [mode, setMode] = useState('signup');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState(profile?.display_name ?? '');
-  const [avatar, setAvatar] = useState(profile?.avatar ?? 'spark');
+  const [avatar, setAvatar] = useState(profile?.avatar === 'woman' ? 'woman' : 'man');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -557,8 +560,15 @@ function Onboarding() {
     if (profile?.onboarding_completed) navigate('/home', { replace: true });
   }, [profile, navigate]);
 
+  useEffect(() => {
+    if (profile?.display_name) setDisplayName(profile.display_name);
+    if (profile?.avatar === 'man' || profile?.avatar === 'woman') setAvatar(profile.avatar);
+  }, [profile]);
+
   if (!isSupabaseConfigured) return <ConfigMissing />;
   if (loading) return <LoadingScreen />;
+  if (user && profileLoading && !profile) return <LoadingScreen />;
+  if (user && profile?.onboarding_completed) return <Navigate to="/home" replace />;
 
   async function submitAuth(event) {
     event.preventDefault();
@@ -572,6 +582,13 @@ function Onboarding() {
     setBusy(false);
     if (error) {
       setMessage(error.message);
+      return;
+    }
+    if (data.session?.user) {
+      const nextProfile = await refreshProfile(data.session.user.id);
+      if (nextProfile?.onboarding_completed) {
+        navigate('/home', { replace: true });
+      }
       return;
     }
     if (!data.session && mode === 'signup') {
@@ -599,8 +616,11 @@ function Onboarding() {
         return;
       }
 
+      const nextProfile = { ...(profile ?? {}), ...profilePayload };
+      setProfile(nextProfile);
+      window.localStorage.setItem(`everyday-pulse-profile-${user.id}`, JSON.stringify(nextProfile));
       await refreshProfile(user.id);
-      navigate('/first-mission', { replace: true });
+      navigate('/home', { replace: true });
     } catch (error) {
       setMessage(error.message || 'Could not finish onboarding. Please try again.');
     } finally {
@@ -656,19 +676,20 @@ function Onboarding() {
             <input className="input" value={displayName} onChange={(event) => setDisplayName(event.target.value)} placeholder="Your name" />
           </label>
           <div className="space-y-2">
-            <span className="text-sm font-bold">Avatar</span>
-            <div className="grid grid-cols-4 gap-2">
-              {['spark', 'leaf', 'star', 'heart'].map((item) => (
+            <span className="text-sm font-bold">Profile icon</span>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { key: 'man', label: 'Man' },
+                { key: 'woman', label: 'Woman' },
+              ].map((item) => (
                 <button
                   type="button"
-                  key={item}
-                  className={`avatar-choice ${avatar === item ? 'avatar-choice-active' : ''}`}
-                  onClick={() => setAvatar(item)}
+                  key={item.key}
+                  className={`avatar-choice ${avatar === item.key ? 'avatar-choice-active' : ''}`}
+                  onClick={() => setAvatar(item.key)}
                 >
-                  {item === 'spark' && <Sparkles size={22} />}
-                  {item === 'leaf' && <Leaf size={22} />}
-                  {item === 'star' && <Star size={22} />}
-                  {item === 'heart' && <Heart size={22} />}
+                  <User size={20} />
+                  <span>{item.label}</span>
                 </button>
               ))}
             </div>
@@ -1097,6 +1118,7 @@ function CompletionFlow() {
   const { user, profile, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const [mission, setMission] = useState(null);
+  const [loadingMission, setLoadingMission] = useState(true);
   const [step, setStep] = useState(1);
   const [feeling, setFeeling] = useState('');
   const [reflection, setReflection] = useState('');
@@ -1117,12 +1139,29 @@ function CompletionFlow() {
         return;
       }
       setMission(nextMission);
+      setLoadingMission(false);
     }
     loadMission();
     return () => {
       mounted = false;
     };
   }, [missionId, navigate, user.id]);
+
+  if (loadingMission) {
+    return (
+      <AppShell hideNav>
+        <LoadingCard />
+      </AppShell>
+    );
+  }
+
+  if (!mission) {
+    return (
+      <AppShell hideNav>
+        <EmptyState title="Pulse not found" body="This pulse may have been removed. Go back home and choose another small step." />
+      </AppShell>
+    );
+  }
 
   async function finish(nextReflection = reflection) {
     if (busy) return;
@@ -1612,7 +1651,7 @@ function AppShell({ children, hideNav = false }) {
 function CenteredShell({ children }) {
   return (
     <main className="min-h-screen px-0 py-0 text-pulse-ink sm:px-4 sm:py-6">
-      <div className="app-frame mx-auto flex min-h-screen w-full max-w-[430px] items-center px-4 py-8 sm:min-h-[calc(100vh-48px)]">
+      <div className="app-frame mx-auto flex min-h-screen w-full max-w-[430px] items-center justify-center px-4 py-8 sm:min-h-[calc(100vh-48px)]">
         {children}
       </div>
     </main>
