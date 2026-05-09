@@ -18,6 +18,7 @@ import {
   Coins,
   Compass,
   Dice5,
+  Download,
   Flame,
   Grid2X2,
   Heart,
@@ -714,8 +715,19 @@ function HomeScreen() {
   const [loading, setLoading] = useState(false);
   const [surpriseBusy, setSurpriseBusy] = useState(false);
   const [xpOpen, setXpOpen] = useState(false);
+  const [installOpen, setInstallOpen] = useState(false);
+  const [installPrompt, setInstallPrompt] = useState(null);
   const [reflectionOpen, setReflectionOpen] = useState(false);
   const [activeDetailsOpen, setActiveDetailsOpen] = useState(false);
+
+  useEffect(() => {
+    function handleBeforeInstallPrompt(event) {
+      event.preventDefault();
+      setInstallPrompt(event);
+    }
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  }, []);
 
   async function load() {
     setLoading(true);
@@ -789,6 +801,16 @@ function HomeScreen() {
     }
   }
 
+  async function installApp() {
+    if (!installPrompt) {
+      setInstallOpen(true);
+      return;
+    }
+    installPrompt.prompt();
+    await installPrompt.userChoice.catch(() => null);
+    setInstallPrompt(null);
+  }
+
   return (
     <AppShell>
       <div className="mb-4 flex items-start justify-between gap-3">
@@ -800,7 +822,10 @@ function HomeScreen() {
           <h1 className="mt-1 text-[22px] font-black leading-tight">{getGreeting()}, {firstName(profile?.display_name)}</h1>
           <p className="mt-1 text-[14px] font-bold text-pulse-muted">Ready to change the script?</p>
         </div>
-        <XpChip xp={totalXP} onClick={() => setXpOpen(true)} />
+        <div className="flex shrink-0 items-center gap-2">
+          <InstallButton onClick={installApp} />
+          <XpChip xp={totalXP} onClick={() => setXpOpen(true)} />
+        </div>
       </div>
 
       <div className="mb-3">
@@ -849,6 +874,7 @@ function HomeScreen() {
       </div>
 
       {xpOpen && <XpModal profile={displayProfile} onClose={() => setXpOpen(false)} />}
+      {installOpen && <InstallHelpModal onClose={() => setInstallOpen(false)} />}
       {reflectionOpen && completion && <ReflectionSheet completion={completion} onClose={() => setReflectionOpen(false)} />}
       {activeDetailsOpen && active && <PulseDetailSheet mission={active.missions} onClose={() => setActiveDetailsOpen(false)} />}
     </AppShell>
@@ -1674,6 +1700,14 @@ function XpChip({ xp, onClick }) {
   );
 }
 
+function InstallButton({ onClick }) {
+  return (
+    <button className="install-chip" onClick={onClick} title="Install app" aria-label="Install app">
+      <Download size={17} />
+    </button>
+  );
+}
+
 function NoMissionActions({ onSurprise, surpriseBusy = false }) {
   return (
     <section className="space-y-3">
@@ -1983,6 +2017,28 @@ function XpModal({ profile, onClose }) {
         <ProgressBar value={progress} />
         <RecapRow label="Next level" value={nextLevel.name} />
         <RecapRow label="Next unlock" value={nextUnlock.name} />
+      </div>
+    </Modal>
+  );
+}
+
+function InstallHelpModal({ onClose }) {
+  return (
+    <Modal onClose={onClose}>
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <img className="brand-logo h-12 w-12" src="/everyday-pulse-thumbnail.png" alt="" />
+          <div>
+            <p className="eyebrow">Install app</p>
+            <h2 className="text-2xl font-black">Add Everyday Pulse</h2>
+          </div>
+        </div>
+        <p className="leading-relaxed text-pulse-muted">
+          On Android Chrome, open the live HTTPS website, tap the three-dot menu, then choose Install app or Add to Home screen.
+        </p>
+        <div className="rounded-3xl bg-pulse-blueSoft p-4 text-sm font-bold text-pulse-ink">
+          The install prompt may not appear on localhost. It works best after the app is deployed to Vercel or Netlify.
+        </div>
       </div>
     </Modal>
   );

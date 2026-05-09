@@ -148,6 +148,11 @@
     background: linear-gradient(135deg, #eef4ff, #dfeaff);
   }
 
+  .install-chip {
+    @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[#3156d4] shadow-card transition active:scale-95;
+    background: linear-gradient(135deg, #fff4d8, #e8f2ff);
+  }
+
   .xp-mini {
     @apply shrink-0 rounded-full bg-pulse-blueSoft px-3 py-1 text-xs font-black text-pulse-primary;
   }
