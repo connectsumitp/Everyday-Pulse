@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Confirm your Everyday Pulse account</title>
+  </head>
+  <body style="margin:0;background:#eef5ff;font-family:Arial,Helvetica,sans-serif;color:#16213a;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#eef5ff;padding:28px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#fbfdff;border:1px solid #dce7f6;border-radius:28px;overflow:hidden;box-shadow:0 18px 48px rgba(31,65,132,0.14);">
+            <tr>
+              <td style="padding:30px 26px 18px;text-align:center;background:linear-gradient(135deg,#fbfdff 0%,#e8f2ff 58%,#fff4d8 100%);">
+                <img
+                  src="{{ .SiteURL }}/everyday-pulse-thumbnail.png"
+                  width="132"
+                  height="132"
+                  alt="Everyday Pulse"
+                  style="display:block;margin:0 auto 18px;border-radius:32px;box-shadow:0 14px 38px rgba(109,74,255,0.18);"
+                />
+                <div style="font-size:13px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:#5d6b84;">Everyday Pulse</div>
+                <h1 style="margin:10px 0 8px;font-size:30px;line-height:1.12;color:#17213a;">Confirm your account</h1>
+                <p style="margin:0;font-size:17px;line-height:1.55;color:#5d6b84;">Do small real-life pulses. Earn Life XP. Change the script.</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:26px;">
+                <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#243047;">Use the button below to verify your email and start your first real-life pulse.</p>
+                <a
+                  href="{{ .ConfirmationURL }}"
+                  style="display:block;text-align:center;background:linear-gradient(135deg,#4f6cff,#2478ff 48%,#16a6d9);color:#ffffff;text-decoration:none;font-weight:800;font-size:17px;border-radius:20px;padding:16px 22px;"
+                >Confirm email</a>
+                <div style="margin:22px 0;padding:18px;border-radius:20px;background:#eef4ff;border:1px solid #dce7f6;">
+                  <div style="font-size:12px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:#5d6b84;">Verification code</div>
+                  <div style="margin-top:8px;font-size:28px;letter-spacing:0.18em;font-weight:800;color:#2447d8;">{{ .Token }}</div>
+                </div>
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td style="padding:14px 0;border-top:1px solid #e2eaf6;">
+                      <strong style="display:block;margin-bottom:4px;color:#17213a;">What you will do inside</strong>
+                      <span style="font-size:14px;line-height:1.55;color:#5d6b84;">Choose one tiny pulse for the day, complete it in real life, note how it felt, and build weekly momentum without guilt.</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:14px 0;border-top:1px solid #e2eaf6;">
+                      <strong style="display:block;margin-bottom:4px;color:#17213a;">Your first win</strong>
+                      <span style="font-size:14px;line-height:1.55;color:#5d6b84;">Start with a 5-minute action like replying to one delayed message, stepping outside, or clearing one small surface.</span>
+                    </td>
+                  </tr>
+                </table>
+                <p style="margin:18px 0 0;font-size:12px;line-height:1.5;color:#7b8798;">If the button does not work, paste this link into your browser:<br /><span style="color:#2447d8;word-break:break-all;">{{ .ConfirmationURL }}</span></p>
+              </td>
+            </tr>
+          </table>
+          <p style="max-width:520px;margin:18px auto 0;font-size:12px;line-height:1.5;text-align:center;color:#6b7280;">You are receiving this because you signed up for Everyday Pulse.</p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

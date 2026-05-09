@@ -1,0 +1,17 @@
+{
+  "name": "Everyday Pulse",
+  "short_name": "Pulse",
+  "description": "Do small real-life missions. Earn Life XP. Change the script.",
+  "start_url": "/home",
+  "display": "standalone",
+  "background_color": "#FAF8F3",
+  "theme_color": "#6D4AFF",
+  "icons": [
+    {
+      "src": "/everyday-pulse-thumbnail.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
