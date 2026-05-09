@@ -2034,10 +2034,15 @@ function InstallHelpModal({ onClose }) {
           </div>
         </div>
         <p className="leading-relaxed text-pulse-muted">
-          On Android Chrome, open the live HTTPS website, tap the three-dot menu, then choose Install app or Add to Home screen.
+          On Android Chrome, open the live HTTPS website and tap this install icon. If Chrome does not show the prompt, use the
+          three-dot menu and choose Install app or Add to Home screen.
         </p>
         <div className="rounded-3xl bg-pulse-blueSoft p-4 text-sm font-bold text-pulse-ink">
-          The install prompt may not appear on localhost. It works best after the app is deployed to Vercel or Netlify.
+          Do not use Download page. That saves an .mht offline copy, not the app. The real install creates an Everyday Pulse icon on
+          your home screen or app drawer.
+        </div>
+        <div className="rounded-3xl bg-pulse-yellowSoft p-4 text-sm font-bold text-pulse-ink">
+          The install prompt usually will not appear on localhost. Test from your deployed HTTPS URL after publishing the app.
         </div>
       </div>
     </Modal>
