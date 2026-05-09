@@ -1702,7 +1702,7 @@ function XpChip({ xp, onClick }) {
 
 function InstallButton({ onClick }) {
   return (
-    <button className="install-chip" onClick={onClick} title="Install app" aria-label="Install app">
+    <button className="install-chip" onClick={onClick} title="Add to Home Screen" aria-label="Add to Home Screen">
       <Download size={17} />
     </button>
   );
@@ -2029,17 +2029,17 @@ function InstallHelpModal({ onClose }) {
         <div className="flex items-center gap-3">
           <img className="brand-logo h-12 w-12" src="/everyday-pulse-thumbnail.png" alt="" />
           <div>
-            <p className="eyebrow">Install app</p>
+            <p className="eyebrow">Home screen</p>
             <h2 className="text-2xl font-black">Add Everyday Pulse</h2>
           </div>
         </div>
         <p className="leading-relaxed text-pulse-muted">
-          On Android Chrome, open the live HTTPS website and tap this install icon. If Chrome does not show the prompt, use the
-          three-dot menu and choose Install app or Add to Home screen.
+          On Android Chrome, tap this icon and confirm the browser prompt. If Chrome does not show it, use the three-dot menu and
+          choose Add to Home screen.
         </p>
         <div className="rounded-3xl bg-pulse-blueSoft p-4 text-sm font-bold text-pulse-ink">
-          Do not use Download page. That saves an .mht offline copy, not the app. The real install creates an Everyday Pulse icon on
-          your home screen or app drawer.
+          Do not use Download page. That saves an .mht offline copy, not the app shortcut. The correct flow creates an Everyday Pulse
+          icon on your home screen or app drawer.
         </div>
         <div className="rounded-3xl bg-pulse-yellowSoft p-4 text-sm font-bold text-pulse-ink">
           The install prompt usually will not appear on localhost. Test from your deployed HTTPS URL after publishing the app.
